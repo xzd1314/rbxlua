@@ -1,0 +1,271 @@
+-- RejoinServerTimer_FullNotify_LocalScript.lua
+-- 计时器 + 移动端拖动 + 重进当前服务器 + Roblox 官方通知
+
+-- ================= 服务 =================
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local TeleportService = game:GetService("TeleportService")
+local StarterGui = game:GetService("StarterGui")
+
+local player = Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+
+-- ================= Roblox 官方提示框 =================
+task.spawn(function()
+	task.wait(0.5)
+	pcall(function()
+		StarterGui:SetCore("SendNotification", {
+			Title = "脚本已成功加载",
+			Text = "by.xzd1314\n\n使用须知：\n1. 请勿频繁重新加入服务器\n2. 计时期间请勿关闭游戏\n3. 本脚本仅供学习与测试使用",
+			Duration = 10
+		})
+	end)
+end)
+
+-- ================= GUI =================
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TimerGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = PlayerGui
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 280, 0, 260)
+mainFrame.Position = UDim2.new(0, 20, 0, 20)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 8)
+
+-- ================= 标题栏（可拖动） =================
+local titleBar = Instance.new("Frame", mainFrame)
+titleBar.Size = UDim2.new(1, 0, 0, 30)
+titleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+
+local titleLabel = Instance.new("TextLabel", titleBar)
+titleLabel.Size = UDim2.new(1, -60, 1, 0)
+titleLabel.Position = UDim2.new(0, 10, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "计时器"
+titleLabel.TextColor3 = Color3.new(1, 1, 1)
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.TextSize = 16
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local closeButton = Instance.new("TextButton", titleBar)
+closeButton.Size = UDim2.new(0, 25, 0, 25)
+closeButton.Position = UDim2.new(1, -30, 0, 3)
+closeButton.Text = "X"
+closeButton.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
+closeButton.TextColor3 = Color3.new(1, 1, 1)
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.TextSize = 14
+
+-- ================= 时间输入 =================
+local timeInputs = {
+	{label = "小时", max = 23, default = 0},
+	{label = "分钟", max = 59, default = 0},
+	{label = "秒", max = 59, default = 10},
+}
+
+local inputFrames = {}
+
+for i, data in ipairs(timeInputs) do
+	local frame = Instance.new("Frame", mainFrame)
+	frame.Size = UDim2.new(1, -20, 0, 50)
+	frame.Position = UDim2.new(0, 10, 0, 35 + (i - 1) * 55)
+	frame.BackgroundTransparency = 1
+
+	local label = Instance.new("TextLabel", frame)
+	label.Size = UDim2.new(0.25, 0, 1, 0)
+	label.BackgroundTransparency = 1
+	label.Text = data.label .. ":"
+	label.TextColor3 = Color3.fromRGB(220, 220, 220)
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.Font = Enum.Font.SourceSansSemibold
+	label.TextSize = 14
+
+	local box = Instance.new("TextBox", frame)
+	box.Size = UDim2.new(0.3, 0, 0, 35)
+	box.Position = UDim2.new(0.3, 0, 0, 8)
+	box.Text = tostring(data.default)
+	box.BackgroundColor3 = Color3.fromRGB(60, 60, 70)
+	box.TextColor3 = Color3.new(1, 1, 1)
+	box.TextSize = 18
+	box.BorderSizePixel = 0
+	box.Font = Enum.Font.SourceSans
+
+	local btnFrame = Instance.new("Frame", frame)
+	btnFrame.Size = UDim2.new(0.4, 0, 1, 0)
+	btnFrame.Position = UDim2.new(0.65, 0, 0, 0)
+	btnFrame.BackgroundTransparency = 1
+
+	local up = Instance.new("TextButton", btnFrame)
+	up.Size = UDim2.new(0.45, 0, 0, 25)
+	up.Position = UDim2.new(0, 0, 0, 8)
+	up.Text = "+"
+	up.BackgroundColor3 = Color3.fromRGB(70, 140, 70)
+	up.TextColor3 = Color3.new(1, 1, 1)
+	up.Font = Enum.Font.SourceSansBold
+	up.TextSize = 16
+
+	local down = Instance.new("TextButton", btnFrame)
+	down.Size = UDim2.new(0.45, 0, 0, 25)
+	down.Position = UDim2.new(0.55, 0, 0, 8)
+	down.Text = "-"
+	down.BackgroundColor3 = Color3.fromRGB(140, 70, 70)
+	down.TextColor3 = Color3.new(1, 1, 1)
+	down.Font = Enum.Font.SourceSansBold
+	down.TextSize = 16
+
+	table.insert(inputFrames, {
+		textBox = box,
+		upButton = up,
+		downButton = down,
+		maxValue = data.max
+	})
+end
+
+-- ================= 开始按钮 & 显示 =================
+local startButton = Instance.new("TextButton", mainFrame)
+startButton.Size = UDim2.new(1, -20, 0, 40)
+startButton.Position = UDim2.new(0, 10, 0, 195)
+startButton.Text = "开始计时"
+startButton.BackgroundColor3 = Color3.fromRGB(60, 120, 220)
+startButton.TextColor3 = Color3.new(1, 1, 1)
+startButton.Font = Enum.Font.SourceSansBold
+startButton.TextSize = 18
+
+local timerDisplay = Instance.new("TextLabel", mainFrame)
+timerDisplay.Size = UDim2.new(1, -20, 0, 25)
+timerDisplay.Position = UDim2.new(0, 10, 0, 235)
+timerDisplay.BackgroundTransparency = 1
+timerDisplay.TextColor3 = Color3.fromRGB(200, 200, 255)
+timerDisplay.Font = Enum.Font.SourceSansSemibold
+timerDisplay.TextSize = 14
+
+-- ================= 逻辑 =================
+local timerActive = false
+local endTime = 0
+
+local function formatTime(sec)
+	sec = math.max(0, math.floor(sec))
+	return string.format(
+		"%02d:%02d:%02d",
+		math.floor(sec / 3600),
+		math.floor(sec % 3600 / 60),
+		sec % 60
+	)
+end
+
+local function updateTimerDisplay()
+	local h = tonumber(inputFrames[1].textBox.Text) or 0
+	local m = tonumber(inputFrames[2].textBox.Text) or 0
+	local s = tonumber(inputFrames[3].textBox.Text) or 0
+	timerDisplay.Text = "设置时间: " .. string.format("%02d:%02d:%02d", h, m, s)
+end
+
+local function increaseTime(f)
+	local v = (tonumber(f.textBox.Text) or 0) + 1
+	if v > f.maxValue then v = 0 end
+	f.textBox.Text = tostring(v)
+	updateTimerDisplay()
+end
+
+local function decreaseTime(f)
+	local v = (tonumber(f.textBox.Text) or 0) - 1
+	if v < 0 then v = f.maxValue end
+	f.textBox.Text = tostring(v)
+	updateTimerDisplay()
+end
+
+for _, f in ipairs(inputFrames) do
+	f.upButton.MouseButton1Click:Connect(function()
+		if not timerActive then increaseTime(f) end
+	end)
+	f.downButton.MouseButton1Click:Connect(function()
+		if not timerActive then decreaseTime(f) end
+	end)
+end
+
+local function startTimer()
+	local total = 0
+	total += (tonumber(inputFrames[1].textBox.Text) or 0) * 3600
+	total += (tonumber(inputFrames[2].textBox.Text) or 0) * 60
+	total += (tonumber(inputFrames[3].textBox.Text) or 0)
+	if total <= 0 then total = 1 end
+
+	timerActive = true
+	endTime = tick() + total
+	startButton.Text = "停止计时"
+end
+
+local function stopTimer()
+	timerActive = false
+	startButton.Text = "开始计时"
+	updateTimerDisplay()
+end
+
+startButton.MouseButton1Click:Connect(function()
+	if timerActive then stopTimer() else startTimer() end
+end)
+
+closeButton.MouseButton1Click:Connect(function()
+	screenGui:Destroy()
+end)
+
+-- ================= 拖动（PC + 移动端） =================
+local dragging = false
+local dragInput, dragStart, startPos
+
+local function updateDrag(input)
+	local delta = input.Position - dragStart
+	mainFrame.Position = UDim2.new(
+		startPos.X.Scale,
+		startPos.X.Offset + delta.X,
+		startPos.Y.Scale,
+		startPos.Y.Offset + delta.Y
+	)
+end
+
+titleBar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+	or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragInput = input
+		dragStart = input.Position
+		startPos = mainFrame.Position
+	end
+end)
+
+titleBar.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		updateDrag(input)
+	end
+end)
+
+titleBar.InputEnded:Connect(function(input)
+	if input == dragInput then
+		dragging = false
+	end
+end)
+
+-- ================= 主循环 =================
+RunService.Heartbeat:Connect(function()
+	if not timerActive then return end
+
+	local remaining = endTime - tick()
+	if remaining <= 0 then
+		timerActive = false
+		TeleportService:TeleportToPlaceInstance(
+			game.PlaceId,
+			game.JobId,
+			player
+		)
+	else
+		timerDisplay.Text = "剩余: " .. formatTime(remaining)
+	end
+end)
+
+updateTimerDisplay()
+print("RejoinServerTimer_FullNotify_LocalScript 已加载")
