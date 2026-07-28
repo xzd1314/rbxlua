@@ -6,7 +6,7 @@ end)
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
-local Players, Workspace, RunService, UserInputService, Lighting = game:GetService("Players"), game:GetService("Workspace"), game:GetService("RunService"), game:GetService("UserInputService"), game:GetService("Lighting")
+local Players, Workspace, RunService, UserInputService, Lighting, VirtualInputManager = game:GetService("Players"), game:GetService("Workspace"), game:GetService("RunService"), game:GetService("UserInputService"), game:GetService("Lighting"), game:GetService("VirtualInputManager")
 local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 local Connections = {}
@@ -22,24 +22,26 @@ local function update_original_properties()
     original_properties.walkspeed = humanoid and humanoid.WalkSpeed or 16
 end
 update_original_properties()
-local Window = Fluent:CreateWindow({ 
-    Title = "Germanized's NicoNXBTS Script (V9)|去除人物虚化", 
-    SubTitle = "", 
-    TabWidth = 160, 
-    Size = UDim2.fromOffset(580, 520), 
-    Acrylic = true, 
-    Theme = "Dark", 
-    MinimizeKey = Enum.KeyCode.RightControl 
+
+local Window = Fluent:CreateWindow({
+    Title = "Germanized's NicoNXBTS Script (V9)|汉化版",
+    SubTitle = "",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 520),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.RightControl
 })
 Window.Name = "GermanizedNicos"
 local Tabs = {
-    Visuals = Window:AddTab({ Title = "视觉", Icon = "glasses" }),
-    Movement = Window:AddTab({ Title = "移动", Icon = "move" }),
-    Misc = Window:AddTab({ Title = "杂项", Icon = "toy-brick" }),
+    Main = Window:AddTab({ Title = "功能（自动嘲讽跳教程在最底下）", Icon = "gamepad" }),
     Settings = Window:AddTab({ Title = "设置", Icon = "settings" })
 }
 local Options = Fluent.Options
-Tabs.Visuals:AddToggle("EnableBotESP", {Title = "启用Bot透视", Default = false}):OnChanged(function(enabled)
+
+-- ========== 合并所有功能到【功能】标签页 ==========
+-- 视觉模块
+Tabs.Main:AddToggle("EnableBotESP", {Title = "启用Bot透视", Default = false}):OnChanged(function(enabled)
     local bots_folder = Workspace:FindFirstChild("bots")
     if not bots_folder then return Fluent:Notify({Title = "错误", Content = "未在工作区找到 bots 文件夹！"}) end
     local function set_esp(bot, state)
@@ -58,21 +60,77 @@ Tabs.Visuals:AddToggle("EnableBotESP", {Title = "启用Bot透视", Default = fal
         end)
     end
 end)
-Tabs.Visuals:AddToggle("ThirdPerson", {Title = "开启第三人称", Default = false})
-Tabs.Visuals:AddParagraph({Title = "重要提示：", Content = "第三人称原生实现已移除，开启仅作为标记！"})
-local speed_slider = Tabs.Movement:AddSlider("SpeedChanger", { Title = "行走速度", Default = original_properties.walkspeed, Min = 16, Max = 200, Rounding = 0})
-Tabs.Movement:AddButton({Title = "重置移速", Callback = function() speed_slider:SetValue(original_properties.walkspeed) end})
-Tabs.Movement:AddToggle("Airstrafe", {Title = "空中左右急转", Default = false, Tooltip = "空中按下A/D实现横向漂移"})
-Tabs.Misc:AddToggle("Spinbot", {Title = "自旋视角（反瞄准）", Default = false})
-Tabs.Misc:AddDropdown("SpinbotPitch", {Title = "自旋俯仰角度", Values = {"向下", "向上", "正前方"}, Default = "向下", Multi = false})
-Tabs.Misc:AddParagraph({Title = "注意", Content = "自旋会操作相机，如果再次出现模糊请关闭自旋测试！"})
+
+Tabs.Main:AddToggle("ThirdPerson", {Title = "开启第三人称", Default = false})
+Tabs.Main:AddParagraph({Title = "重要提示：", Content = "第三人称原生实现已移除，开启仅作为标记！"})
+
+-- 移动模块
+local speed_slider = Tabs.Main:AddSlider("SpeedChanger", { Title = "行走速度", Default = original_properties.walkspeed, Min = 16, Max = 200, Rounding = 0})
+Tabs.Main:AddButton({Title = "重置移速", Callback = function() speed_slider:SetValue(original_properties.walkspeed) end})
+Tabs.Main:AddToggle("Airstrafe", {Title = "空中左右急转", Default = false, Tooltip = "空中按下A/D实现横向漂移"})
+
+-- 杂项模块
+Tabs.Main:AddToggle("Spinbot", {Title = "自旋视角（反瞄准）", Default = false})
+Tabs.Main:AddDropdown("SpinbotPitch", {Title = "自旋俯仰角度", Values = {"向下", "向上", "正前方"}, Default = "向下", Multi = false})
+Tabs.Main:AddToggle("AutoWCSpace", {
+    Title = "自动长按 W+C+空格",
+    Default = false,
+    Tooltip = "快捷键F8快速切换，模拟持续按住三个按键"
+})
+Tabs.Main:AddParagraph({Title = "注意", Content = "自旋会操作相机，如果再次出现模糊请关闭自旋测试！"})
+-- 新增使用方法段落
+Tabs.Main:AddParagraph({Title = "使用方法", Content = "需要先开启bot透视，不然看不到bot！！！11，推荐把速度先拉到100，然后找一个舞蹈开始跳，然后打开自动长按W+C+空格选项或者按键盘F8，角色跑起来后再长按键盘C+空格一次角色就会自动嘲讽跳了，如果不行请自己折磨，我测试过是可以的（手机自己练或者用虚拟键盘脚本，delta注入器有自带的键盘脚本"})
+
 Tabs.Settings:AddParagraph({Title = "制作信息", Content = "原作者：Germanized，优化&汉化作者xzd1314"})
+
 SaveManager:SetLibrary(Fluent); InterfaceManager:SetLibrary(Fluent)
 SaveManager:SetFolder("NicosScript/Final_v9"); InterfaceManager:SetFolder("NicosScript/Final_v9")
 SaveManager:IgnoreThemeSettings(); InterfaceManager:BuildInterfaceSection(Tabs.Settings); SaveManager:BuildConfigSection(Tabs.Settings)
+
+-- ====================== 【模拟长按 W + C + Space 核心模块】 ======================
+local autoActive = false
+local inputLoopTask = nil
+
+local function setAutoState(state)
+    if autoActive == state then return end
+    autoActive = state
+    Options.AutoWCSpace.Value = autoActive
+
+    if autoActive then
+        Fluent:Notify({Title = "自动按键", Content = "W+C+空格 长按已开启｜F8关闭", Duration = 2})
+        inputLoopTask = task.spawn(function()
+            while autoActive do
+                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.W, false, nil)
+                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.C, false, nil)
+                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, nil)
+                task.wait(0.02)
+            end
+        end)
+    else
+        if inputLoopTask then
+            task.cancel(inputLoopTask)
+            inputLoopTask = nil
+        end
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.W, false, nil)
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.C, false, nil)
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, nil)
+        Fluent:Notify({Title = "自动按键", Content = "W+C+空格 长按已关闭", Duration = 2})
+    end
+end
+
+Options.AutoWCSpace:OnChanged(setAutoState)
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.F8 and input.UserInputType == Enum.UserInputType.Keyboard then
+        setAutoState(not autoActive)
+    end
+end)
+-- ==============================================================================
+
 LocalPlayer.CharacterAdded:Connect(function(char)
     update_original_properties()
 end)
+
 local spin_angle, spin_speed = 0, 45
 RunService:BindToRenderStep("GermanizedLoop", Enum.RenderPriority.Camera.Value + 1, function(dt)
     pcall(function()
@@ -86,10 +144,10 @@ RunService:BindToRenderStep("GermanizedLoop", Enum.RenderPriority.Camera.Value +
                 local cam_cframe = Camera.CFrame
                 spin_angle = (spin_angle + dt * spin_speed) % (math.pi * 2)
                 local pitch = 0
-                if Options.SpinbotPitch.Value == "向下" then 
-                    pitch = math.rad(90) 
-                elseif Options.SpinbotPitch.Value == "向上" then 
-                    pitch = math.rad(-90) 
+                if Options.SpinbotPitch.Value == "向下" then
+                    pitch = math.rad(90)
+                elseif Options.SpinbotPitch.Value == "向上" then
+                    pitch = math.rad(-90)
                 end
                 root.CFrame = CFrame.new(root.Position) * CFrame.fromOrientation(0, spin_angle, pitch)
                 if not Options.ThirdPerson.Value then Camera.CFrame = cam_cframe end
@@ -106,6 +164,7 @@ RunService:BindToRenderStep("GermanizedLoop", Enum.RenderPriority.Camera.Value +
                 if strafe_vector.Magnitude > 0 then root.Velocity += Vector3.new(strafe_vector.X, 0, strafe_vector.Z).Unit * 120 * dt end
             end
         end
+        -- 关闭景深虚化
         for _,obj in ipairs(Lighting:GetChildren()) do
             if obj:IsA("DepthOfFieldEffect") then
                 obj.Enabled = false
@@ -118,6 +177,7 @@ RunService:BindToRenderStep("GermanizedLoop", Enum.RenderPriority.Camera.Value +
         end
     end)
 end)
+
 Window:SelectTab(1)
 Fluent:Notify({Title = "Germanized's NicoNXBTS Script", Content = "脚本加载完成", Duration = 5})
 pcall(SaveManager.LoadAutoloadConfig, SaveManager)
