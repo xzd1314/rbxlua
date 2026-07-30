@@ -40,13 +40,12 @@ local Tabs = {
 local Options = Fluent.Options
 
 -- ========== 合并所有功能到【功能】标签页 ==========
--- 视觉模块
+-- 视觉模块【修复后的BotESP】
 Tabs.Main:AddToggle("EnableBotESP", {Title = "启用Bot透视", Default = false}):OnChanged(function(enabled)
     local bots_folder = Workspace:FindFirstChild("bots")
     if not bots_folder then return Fluent:Notify({Title = "错误", Content = "未在工作区找到 bots 文件夹！"}) end
     local function set_esp(bot, state)
         if bot and bot:FindFirstChild("HumanoidRootPart") and bot.HumanoidRootPart:FindFirstChild("icon") then
-            bot.HumanoidRootPart.icon.Enabled = state
             bot.HumanoidRootPart.icon.AlwaysOnTop = state
         end
     end
@@ -56,7 +55,17 @@ Tabs.Main:AddToggle("EnableBotESP", {Title = "启用Bot透视", Default = false}
     if Connections.BotAdded then Connections.BotAdded:Disconnect() end
     if enabled then
         Connections.BotAdded = bots_folder.ChildAdded:Connect(function(bot)
-            if bot:IsA("Model") and Options.EnableBotESP.Value then task.wait(0.1); set_esp(bot, true); end
+            if bot:IsA("Model") and Options.EnableBotESP.Value then
+                task.wait(0.1)
+                set_esp(bot, true)
+            end
+        end)
+    else
+        Connections.BotAdded = bots_folder.ChildAdded:Connect(function(bot)
+            if bot:IsA("Model") then
+                task.wait(0.1)
+                set_esp(bot, false)
+            end
         end)
     end
 end)
@@ -78,8 +87,7 @@ Tabs.Main:AddToggle("AutoWCSpace", {
     Tooltip = "快捷键F8快速切换，模拟持续按住三个按键"
 })
 Tabs.Main:AddParagraph({Title = "注意", Content = "自旋会操作相机，如果再次出现模糊请关闭自旋测试！"})
--- 新增使用方法段落
-Tabs.Main:AddParagraph({Title = "使用方法", Content = "需要先开启bot透视，不然看不到bot！！！11，推荐把速度先拉到100，然后找一个舞蹈开始跳，然后打开自动长按W+C+空格选项或者按键盘F8，角色跑起来后再长按键盘C+空格一次角色就会自动嘲讽跳了，如果不行请自己折磨，我测试过是可以的（手机自己练或者用虚拟键盘脚本，delta注入器有自带的键盘脚本"})
+Tabs.Main:AddParagraph({Title = "使用方法", Content = "需要先开启bot透视，不然看不到墙后的bot！推荐把速度先拉到100，然后找一个舞蹈开始跳，然后打开自动长按W+C+空格选项或者按键盘F8，角色跑起来后再长按键盘C+空格一次角色就会自动嘲讽跳了，如果不行请自己调试，我测试过是可以的（手机自己练或者用虚拟键盘脚本，delta注入器有自带的键盘脚本"})
 
 Tabs.Settings:AddParagraph({Title = "制作信息", Content = "原作者：Germanized，优化&汉化作者xzd1314"})
 
