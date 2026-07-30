@@ -88,7 +88,7 @@ Tabs.Main:AddToggle("AutoWCSpace", {
 Tabs.Main:AddParagraph({Title = "注意", Content = "自旋会操作相机，如果再次出现模糊请关闭自旋测试！"})
 Tabs.Main:AddParagraph({Title = "使用方法", Content = "需要先开启bot透视，不然看不到墙后的bot！推荐把速度先拉到100，然后找一个舞蹈开始跳，然后打开自动长按W+C+空格选项或者按键盘F8，角色跑起来后再长按键盘C+空格一次角色就会自动嘲讽跳了，如果不行请自己调试，我测试过是可以的（手机自己练或者用虚拟键盘脚本，delta注入器有自带的键盘脚本"})
 
-Tabs.Settings:AddParagraph({Title = "制作信息", Content = "原作者：Germanized，优化&汉化作者xzd1314"})
+Tabs.Settings:AddParagraph({Title = "制作信息", Content = "原作者：Germanized"})
 
 SaveManager:SetLibrary(Fluent); InterfaceManager:SetLibrary(Fluent)
 SaveManager:SetFolder("NicosScript/Final_v9"); InterfaceManager:SetFolder("NicosScript/Final_v9")
