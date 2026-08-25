@@ -1,21 +1,87 @@
-MIT License
+xzd1314 Source-Available License
+Version 1.0, August 2026
 
 Copyright (c) 2026 xzd1314
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+本许可协议规定了本软件的使用、复制和分发条件。
+通过使用本软件，即表示您同意以下条款。
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. 授予权利
+   作者授予您一项非排他性、不可转让、免版税的许可，允许您
+   为个人、非商业目的使用、复制和分发本软件的原始副本。
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. 禁止修改
+   您不得修改、改编、反编译、反向工程或以其他方式创建
+   本软件的衍生作品，除非获得作者的明确口头同意。
+
+3. 禁止商业使用
+   您不得将本软件或其任何部分用于任何商业目的，包括但不限于
+   出售、出租、授权、嵌入商业产品或提供商业服务。
+
+4. 衍生作品
+   - 创建衍生作品必须事先获得作者的口头同意。
+   - 口头同意包括但不限于：面对面沟通、语音通话、
+     以及通过社交平台（如QQ、微信、Discord、GitHub Issues等）
+     发送的文字消息。
+   - 经同意创建的衍生作品必须以开源形式发布，
+     并保留本许可协议的全部条款。
+
+5. 分发
+   分发本软件时必须保留完整的版权声明和本许可协议全文。
+   您不得在分发时附加任何额外限制。
+
+6. 免责声明
+   本软件按"原样"提供，不提供任何明示或暗示的保证，
+   包括但不限于对适销性、特定用途适用性和非侵权性的保证。
+   在任何情况下，作者均不对因使用本软件而产生的任何索赔、
+   损害或其他责任负责。
+
+7. 终止
+   如您违反本协议的任何条款，您的使用许可将自动终止。
+
+---
+
+xzd1314 Source-Available License
+Version 1.0, August 2026
+
+Copyright (c) 2026 xzd1314
+
+This License Agreement governs the use, copying, and distribution of this software.
+By using this software, you agree to the following terms.
+
+1. Grant of Rights
+   The author grants you a non-exclusive, non-transferable, royalty-free license
+   to use, copy, and distribute unmodified copies of this software
+   for personal, non-commercial purposes.
+
+2. No Modification
+   You may not modify, adapt, decompile, reverse engineer, or otherwise create
+   derivative works of this software without the explicit verbal consent of the author.
+
+3. No Commercial Use
+   You may not use this software or any part of it for any commercial purpose,
+   including but not limited to selling, renting, licensing, embedding in
+   commercial products, or providing commercial services.
+
+4. Derivative Works
+   - Creating derivative works requires prior verbal consent from the author.
+   - Verbal consent includes but is not limited to: face-to-face communication,
+     voice calls, and text messages sent via social platforms
+     (such as QQ, WeChat, Discord, GitHub Issues, etc.).
+   - Derivative works created with consent must be released as open source
+     and retain all terms of this license.
+
+5. Distribution
+   When distributing this software, you must retain the complete copyright notice
+   and the full text of this license. You may not impose any additional restrictions.
+
+6. Disclaimer
+   This software is provided "as is" without any express or implied warranty,
+   including but not limited to warranties of merchantability, fitness for a
+   particular purpose, and non-infringement. In no event shall the author be liable
+   for any claim, damages, or other liability arising from the use of this software.
+
+7. Termination
+   If you violate any terms of this agreement, your license to use this software
+   shall terminate automatically.
+
